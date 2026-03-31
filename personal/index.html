@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lydia You</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
+
+    body {
+      background: #111009;
+      color: #e8dfc8;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    /* Warm vignette */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 90% 65% at 50% 38%, #1d1810 0%, #0b0a07 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 8rem;
+    }
+
+    /* ============ HEADER ============ */
+    .site-header {
+      margin-top: 4.5rem;
+      text-align: center;
+    }
+
+    .site-name {
+      font-family: 'Helvetica Neue', 'Arial', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 400;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: rgba(232, 223, 200, 0.35);
+    }
+
+    /* ============ SHELF ============ */
+    .shelf-section {
+      margin-top: 6rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .books {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      padding: 0 10px;
+    }
+
+    /* Book */
+    .book {
+      position: relative;
+      height: var(--h);
+      width: var(--w);
+      background: var(--color);
+      cursor: pointer;
+      border-radius: 1px 3px 3px 1px;
+      transform: translateY(0) rotate(var(--lean, 0deg));
+      transition:
+        transform 0.32s cubic-bezier(0.34, 1.5, 0.64, 1),
+        box-shadow 0.32s ease;
+      box-shadow:
+        3px 2px 14px rgba(0,0,0,0.75),
+        inset 0 0 0 1px rgba(255,255,255,0.04);
+      will-change: transform;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Left spine edge — light catch */
+    .book::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 8px;
+      background: linear-gradient(to right,
+        rgba(255,255,255,0.22) 0%,
+        rgba(255,255,255,0.06) 55%,
+        transparent 100%);
+      border-radius: 1px 0 0 1px;
+      pointer-events: none;
+    }
+
+    /* Right edge — shadow */
+    .book::after {
+      content: '';
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: rgba(0,0,0,0.38);
+      pointer-events: none;
+    }
+
+    /* Page edges visible at top */
+    .book-pages {
+      position: absolute;
+      top: 0; left: 5px; right: 4px;
+      height: 5px;
+      background: repeating-linear-gradient(
+        to right,
+        #ddd3b8 0px, #ddd3b8 0.6px,
+        #c8bfa5 0.6px, #c8bfa5 1.6px
+      );
+      border-radius: 0 2px 0 0;
+      pointer-events: none;
+    }
+
+    .book:hover {
+      transform: translateY(-15px) rotate(var(--lean, 0deg));
+      box-shadow: 4px 16px 28px rgba(0,0,0,0.85);
+    }
+
+    .book.active {
+      transform: translateY(-20px) rotate(var(--lean, 0deg));
+      box-shadow: 5px 20px 34px rgba(0,0,0,0.9);
+    }
+
+    /* Spine */
+    .spine {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.4rem 0;
+      gap: 0.7rem;
+    }
+
+    .spine-title {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-family: 'Helvetica Neue', 'Arial', sans-serif;
+      font-size: 0.58rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.82);
+      user-select: none;
+    }
+
+    .spine-mark {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      color: rgba(255,255,255,0.28);
+      font-size: 0.5rem;
+      user-select: none;
+    }
+
+    /* Shelf board */
+    .shelf-board {
+      position: relative;
+      width: calc(100% + 32px);
+      height: 14px;
+      background: linear-gradient(
+        180deg,
+        #c09460 0%,
+        #8a6430 30%,
+        #755428 72%,
+        #906a38 100%
+      );
+      border-radius: 1px;
+      box-shadow:
+        0 5px 20px rgba(0,0,0,0.75),
+        0 1px 2px rgba(0,0,0,0.95),
+        inset 0 2px 5px rgba(255,255,255,0.14),
+        inset 0 -1px 2px rgba(0,0,0,0.4);
+    }
+
+    /* Shelf front lip */
+    .shelf-board::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0; right: 0;
+      height: 6px;
+      background: linear-gradient(180deg, #6a4820 0%, #4a3015 100%);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.6);
+    }
+
+    /* ============ CONTENT ============ */
+    .content-area {
+      margin-top: 5.5rem;
+      width: 100%;
+      max-width: 600px;
+      padding: 0 2rem;
+      min-height: 1px;
+    }
+
+    .content-panel {
+      display: none;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .content-panel.visible { display: block; }
+    .content-panel.shown { opacity: 1; transform: translateY(0); }
+
+    .panel-label {
+      font-family: 'Helvetica Neue', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(232, 223, 200, 0.35);
+      margin-bottom: 2.5rem;
+    }
+
+    .panel-body {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: rgba(232, 223, 200, 0.8);
+    }
+
+    .panel-body p + p { margin-top: 1.2em; }
+
+    /* List of items (projects, roles, etc.) */
+    .panel-items {
+      list-style: none;
+      margin-top: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 0.9rem 0;
+      border-bottom: 1px solid rgba(232, 223, 200, 0.08);
+      gap: 1.5rem;
+    }
+
+    .panel-item:first-child { border-top: 1px solid rgba(232, 223, 200, 0.08); }
+
+    .item-title {
+      font-size: 0.97rem;
+      color: rgba(232, 223, 200, 0.88);
+    }
+
+    .item-meta {
+      font-family: 'Helvetica Neue', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.04em;
+      color: rgba(232, 223, 200, 0.35);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    a.item-title, a.item-title:visited {
+      color: rgba(232, 223, 200, 0.88);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    a.item-title:hover { color: rgba(232, 223, 200, 1); }
+
+    /* External link mark */
+    a.item-title[target="_blank"]::after {
+      content: '\2197';
+      font-size: 0.6rem;
+      margin-left: 0.3rem;
+      vertical-align: super;
+      opacity: 0.4;
+    }
+
+    /* Writing panel special */
+    .writing-link-block {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: 'Helvetica Neue', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(232, 223, 200, 0.5);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(232, 223, 200, 0.15);
+      padding-bottom: 0.3rem;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .writing-link-block:hover {
+      color: rgba(232, 223, 200, 0.9);
+      border-color: rgba(232, 223, 200, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <header class="site-header">
+      <p class="site-name">Lydia You</p>
+    </header>
+
+    <div class="shelf-section">
+      <div class="books">
+
+        <div class="book" data-target="creative"
+             style="--color:#2B4A3E; --h:248px; --w:52px; --lean:-0.6deg">
+          <div class="book-pages"></div>
+          <div class="spine">
+            <span class="spine-title">Creative</span>
+            <span class="spine-mark">◆</span>
+          </div>
+        </div>
+
+        <div class="book" data-target="product"
+             style="--color:#6B3428; --h:214px; --w:46px; --lean:0.4deg">
+          <div class="book-pages"></div>
+          <div class="spine">
+            <span class="spine-title">Product</span>
+          </div>
+        </div>
+
+        <div class="book" data-target="work"
+             style="--color:#1E2D4A; --h:236px; --w:58px; --lean:-0.3deg">
+          <div class="book-pages"></div>
+          <div class="spine">
+            <span class="spine-title">Work</span>
+            <span class="spine-mark">—</span>
+          </div>
+        </div>
+
+        <div class="book" data-target="writing"
+             style="--color:#3D4020; --h:202px; --w:48px; --lean:0.7deg">
+          <div class="book-pages"></div>
+          <div class="spine">
+            <span class="spine-title">Writing</span>
+            <span class="spine-mark">↗</span>
+          </div>
+        </div>
+
+      </div>
+      <div class="shelf-board"></div>
+    </div>
+
+    <div class="content-area" id="content-area">
+
+      <div class="content-panel" id="panel-creative">
+        <p class="panel-label">Creative</p>
+        <div class="panel-body">
+          <ul class="panel-items">
+            <li class="panel-item">
+              <span class="item-title">Placeholder project</span>
+              <span class="item-meta">2024</span>
+            </li>
+            <li class="panel-item">
+              <span class="item-title">Placeholder project</span>
+              <span class="item-meta">2023</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="content-panel" id="panel-product">
+        <p class="panel-label">Product</p>
+        <div class="panel-body">
+          <ul class="panel-items">
+            <li class="panel-item">
+              <a class="item-title" href="https://www.rabbit.tech/q2-update" target="_blank">rabbit r1 — Website &amp; Product Video</a>
+              <span class="item-meta">2024</span>
+            </li>
+            <li class="panel-item">
+              <a class="item-title" href="https://openhome.com/" target="_blank">OpenHome AI — Docs &amp; Brand Copy</a>
+              <span class="item-meta">2024</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="content-panel" id="panel-work">
+        <p class="panel-label">Work</p>
+        <div class="panel-body">
+          <ul class="panel-items">
+            <li class="panel-item">
+              <span class="item-title">Placeholder role</span>
+              <span class="item-meta">2024 —</span>
+            </li>
+            <li class="panel-item">
+              <span class="item-title">Placeholder role</span>
+              <span class="item-meta">2022 – 2024</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="content-panel" id="panel-writing">
+        <p class="panel-label">Writing</p>
+        <div class="panel-body">
+          <p>Essays and criticism on culture, place, and the way we live.</p>
+          <p style="margin-top: 2rem;">
+            <a class="writing-link-block" href="https://lydiayou.com" target="_blank">
+              Visit lydiayou.com ↗
+            </a>
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const books = document.querySelectorAll('.book');
+    let active = null;
+
+    books.forEach(book => {
+      book.addEventListener('click', () => {
+        const target = book.dataset.target;
+
+        if (active === target) {
+          book.classList.remove('active');
+          hidePanel(target);
+          active = null;
+          return;
+        }
+
+        if (active) {
+          document.querySelector(`.book[data-target="${active}"]`).classList.remove('active');
+          hidePanel(active);
+        }
+
+        book.classList.add('active');
+        showPanel(target);
+        active = target;
+      });
+    });
+
+    function showPanel(id) {
+      const panel = document.getElementById(`panel-${id}`);
+      if (!panel) return;
+      panel.classList.add('visible');
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        panel.classList.add('shown');
+      }));
+      setTimeout(() => {
+        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 120);
+    }
+
+    function hidePanel(id) {
+      const panel = document.getElementById(`panel-${id}`);
+      if (!panel) return;
+      panel.classList.remove('shown');
+      setTimeout(() => panel.classList.remove('visible'), 380);
+    }
+  </script>
+</body>
+</html>
