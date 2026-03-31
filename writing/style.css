@@ -118,11 +118,11 @@ footer .site-wrapper {
 }
 
 .index-hero .tagline {
-  font-size: 1.6rem;
-  line-height: 1.45;
+  font-size: 1rem;
+  line-height: 1.75;
   font-weight: normal;
   font-style: italic;
-  max-width: 560px;
+  max-width: 480px;
   color: var(--ink);
 }
 
