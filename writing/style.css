@@ -122,12 +122,24 @@ footer .site-wrapper {
   line-height: 1.45;
   font-weight: normal;
   font-style: italic;
-  max-width: 440px;
+  max-width: 560px;
   color: var(--ink);
 }
 
 .index-hero .tagline em {
   font-style: normal;
+}
+
+.index-hero .tagline a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(26, 26, 26, 0.3);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s ease;
+}
+
+.index-hero .tagline a:hover {
+  text-decoration-color: rgba(26, 26, 26, 0.8);
 }
 
 .index-nav {
