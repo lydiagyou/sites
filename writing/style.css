@@ -351,6 +351,14 @@ footer .site-wrapper {
   margin-bottom: 0;
 }
 
+/* Long titles may run past the text column on wide screens */
+@media (min-width: 720px) {
+  .piece-page-header h1.title-wide {
+    max-width: none;
+    white-space: nowrap;
+  }
+}
+
 .piece-page-subtitle {
   font-style: italic;
   color: var(--muted);
