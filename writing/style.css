@@ -388,10 +388,11 @@ footer .site-wrapper {
 }
 
 .piece-page-body h2 {
-  font-size: 1.05rem;
-  font-weight: normal;
-  font-style: italic;
-  margin: 2.6em 0 1em;
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  font-weight: bold;
+  line-height: 1.35;
+  margin: 2.8em 0 0.9em;
 }
 
 .piece-page-body .fn-ref {
